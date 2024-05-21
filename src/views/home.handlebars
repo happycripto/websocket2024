@@ -1,0 +1,17 @@
+<main>
+    <h1>hola coders Soy una plantilla de hendlebars, Bienvenido {{ nombre }}</h1>
+    <h2>{{ apellido }}</h2>
+    <div>
+        {{#if role}}
+            <h2>Listado de Productos Disponibles</h2>
+            {{#each products}}
+    <div>
+        <p>Nombre del producto {{this.title}}</p>
+        <p>Precio del producto {{#if this.price}}{{this.price}}{{else}}Precio no disponible{{/if}}</p>
+    </div>
+            {{/each}}
+        {{else}}
+            <h2>No puede ver los productos</h2>
+        {{/if}}
+    </div>
+</main>

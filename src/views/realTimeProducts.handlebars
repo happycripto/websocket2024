@@ -1,0 +1,109 @@
+<main>
+    <h1>hola coders Soy una plantilla de hendlebars, Bienvenido {{ nombre }}</h1>
+    <h2>{{ apellido }}</h2>
+    <div>
+        {{#if role}}
+            <h2>Listado de Productos Disponibles</h2>
+            <div id="productList">
+                {{#each products}}
+                    <div>
+                        <p>ID del producto: {{this.id}}</p>
+                        <p>Nombre del producto: {{this.title}}</p>
+                        <p>Precio del producto: {{#if this.price}}{{this.price}}{{else}}Precio no disponible{{/if}}</p>
+                    </div>
+                {{/each}}
+            </div>
+        {{else}}
+            <h2>No puede ver los productos</h2>
+        {{/if}}
+    </div>
+    <h2>Eliminar Producto por ID</h2>
+    <form id="deleteProductForm">
+        <input type="text" name="productId" placeholder="ID del producto a eliminar">
+        <button type="submit">Eliminar Producto</button>
+    </form>
+    <h2>Crear Producto por ID</h2>
+    <form id="createProductForm">
+        <input type="text" name="title" placeholder="Nombre del producto">
+        <input type="number" name="price" placeholder="Precio">
+        <button type="submit">Crear Producto</button>
+    </form>
+</main>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    // Manejar envío del formulario de creación de producto
+    document.getElementById('createProductForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const product = {
+            title: formData.get('title'),
+            price: formData.get('price')
+        };
+
+        try {
+            const response = await fetch('/api/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(product)
+            });
+
+            if (response.ok) {
+                console.log('Producto agregado exitosamente desde handlebars');
+                event.target.reset();
+            } else {
+                const errorData = await response.json();
+                console.error('Error al agregar producto:', errorData.error);
+            }
+        } catch (error) {
+            console.error('Error al enviar solicitud:', error);
+        }
+    });
+
+    // Manejar envío del formulario de eliminación de producto
+document.getElementById('deleteProductForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const productId = formData.get('productId'); // Corregido: 'productId' en lugar de 'id'
+
+    try {
+        const response = await fetch(`/api/products/${productId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: productId })
+        });
+
+        if (response.ok) {
+            console.log('Producto eliminado exitosamente');
+            event.target.reset();
+        } else {
+            const errorData = await response.json();
+            console.error('Error al eliminar producto:', errorData.error);
+        }
+    } catch (error) {
+        console.error('Error al enviar solicitud:', error);
+    }
+});
+
+  // Escuchar eventos de actualización de productos
+    socket.on('productUpdated', (products) => {
+        const productList = document.getElementById('productList');
+        if (productList) {
+            productList.innerHTML = ''; // Limpiar la lista antes de agregar los productos actualizados
+            products.forEach(product => {
+                const productDiv = document.createElement('div');
+                productDiv.innerHTML = `
+                    <p>ID del producto: ${product.id}</p>
+                    <p>Nombre del producto: ${product.title}</p>
+                    <p>Precio del producto: ${product.price ? product.price : 'Precio no disponible'}</p>
+                `;
+                productList.appendChild(productDiv);
+            });
+        }
+    });
+</script>

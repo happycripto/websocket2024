@@ -1,0 +1,21 @@
+{"type": "module",
+  "dependencies": {
+    "express": "^4.19.2",
+    "express-handlebars": "^7.1.2",
+    "handlebars": "^4.7.8",
+    "nodemon": "^3.1.0",
+    "socket.io": "^4.7.5"
+  },
+  "name": "src",
+  "version": "1.0.0",
+  "main": "app/app.js",
+  "scripts": {
+    "start": "node src/app/app.js",
+    "dev": "nodemon app/app.js",
+    "start:dev": "node --watch app/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
